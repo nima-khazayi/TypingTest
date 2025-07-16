@@ -5,6 +5,7 @@ import pyfiglet                     # For ASCII art
 import os
 import shutil
 import time
+from textcreator import dict
 
 console = Console()
 
@@ -18,7 +19,6 @@ def enterance():
     console.print(message)
     print("     ________________________________________")
     
-
 def colorized_message(message, color="cyan"):
     """Print a colorized message."""
     if color == "white":
@@ -30,16 +30,22 @@ def colorized_message(message, color="cyan"):
             console.print(i, end="")
             time.sleep(0.04)
 
-def main():
+def sample_words(num):
+    """Appears the TypingText"""
+    dictionary = dict(num)
     clear()
     enterance()
-    """Main function."""
-    try:
-        print("")
-        colorized_message("Welcome to My Project!\n", "green")
-        colorized_message("Press Enter to continue...", "orange")
-        input()  # Wait for user input
-        while True:
+    print("")
+    text = " ".join(dictionary)
+    print(text)
+
+def better_print():
+    pass
+
+def get_valid_input():
+    """Length taker"""
+    while True:
+        try:
             clear()
             enterance()
             print("")
@@ -47,10 +53,24 @@ def main():
             num = int(input())
             if num < 30:
                 colorized_message("Choose 30 or more words!", "red")
-                time.sleep(3)
-            
+                time.sleep(3)        
             else:
+                sample_words(num)
                 break
+
+        except ValueError:
+            colorized_message("Your input number was not in a valid integer form", "red")
+
+def main():
+    clear()
+    enterance()
+    """Main function."""
+    print("")
+    colorized_message("Welcome to My Project!\n", "green")
+    colorized_message("Press Enter to continue...", "orange")
+    input()  # Wait for user input
+    try:
+        get_valid_input()
 
     except ModuleNotFoundError:
         colorized_message("\nModule not found", "red")
@@ -59,8 +79,7 @@ def main():
         colorized_message("\nAn unexpected error occurred", "red")
     except KeyboardInterrupt:
         colorized_message("\nAn unexpected error occurred", "red")
-    except ValueError:
-        colorized_message("Your input number was not in a valid integer form", "red")
+    
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,4 @@
+nltk==3.9.1
+rich==14.0.0
+pyfiglet==1.0.3
+pytest==8.4.1
