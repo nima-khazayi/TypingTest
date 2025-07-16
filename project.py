@@ -16,7 +16,7 @@ def enterance():
     """Display entrance text in slanted ASCII art."""
     message = pyfiglet.figlet_format("TypingTest", font="slant")
     console.print(message)
-    print("________________________________________")
+    print("     ________________________________________")
     
 
 def colorized_message(message, color="cyan"):
@@ -39,8 +39,18 @@ def main():
         colorized_message("Welcome to My Project!\n", "green")
         colorized_message("Press Enter to continue...", "orange")
         input()  # Wait for user input
-        clear()
-
+        while True:
+            clear()
+            enterance()
+            print("")
+            colorized_message("Choose the number of your typing test words: ", "green")
+            num = int(input())
+            if num < 30:
+                colorized_message("Choose 30 or more words!", "red")
+                time.sleep(3)
+            
+            else:
+                break
 
     except ModuleNotFoundError:
         colorized_message("\nModule not found", "red")
@@ -49,6 +59,8 @@ def main():
         colorized_message("\nAn unexpected error occurred", "red")
     except KeyboardInterrupt:
         colorized_message("\nAn unexpected error occurred", "red")
+    except ValueError:
+        colorized_message("Your input number was not in a valid integer form", "red")
 
 if __name__ == "__main__":
     main()
