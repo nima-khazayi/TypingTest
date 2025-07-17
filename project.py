@@ -60,7 +60,7 @@ def better_print(text):
     text_tmp[0] = " " + text_tmp[0]
     text = " ".join(text_tmp) 
     print(text)
-    init(text)
+    init(text, height, width)
     curses.wrapper(screen)
 
 
