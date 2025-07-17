@@ -6,6 +6,7 @@ import os
 import shutil
 import time
 from textcreator import dict
+from initializer import init, screen
 
 console = Console()
 
@@ -37,10 +38,31 @@ def sample_words(num):
     enterance()
     print("")
     text = " ".join(dictionary)
-    print(text)
+    better_print(text)
+    
 
-def better_print():
-    pass
+def better_print(text):
+    """Take the terminal length, Hints, More user friendly"""
+    # Initialize the screen size
+    terminal_size = shutil.get_terminal_size()
+    height = terminal_size.lines
+    width = terminal_size.columns
+
+    # Make the text of the words, screen dynamic
+    words_length = 0
+    text_tmp = text.split(" ")
+    for i in range(len(text_tmp)):
+        words_length += len(text_tmp[i]) + 1
+        if words_length >= width:
+            text_tmp[i - 1] += "\n"
+            words_length = len(text_tmp[i])
+
+    text_tmp[0] = " " + text_tmp[0]
+    text = " ".join(text_tmp) 
+    print(text)
+    curses.wrapper(screen)
+    initializer.init(text)
+    
 
 def get_valid_input():
     """Length taker"""
