@@ -60,9 +60,9 @@ def better_print(text):
     text_tmp[0] = " " + text_tmp[0]
     text = " ".join(text_tmp) 
     print(text)
+    init(text)
     curses.wrapper(screen)
-    initializer.init(text)
-    
+
 
 def get_valid_input():
     """Length taker"""

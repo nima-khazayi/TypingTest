@@ -7,7 +7,6 @@ def init(text):
     """Take the global variable text"""
     global var
     var = text
-    curses.wrapper(screen)
 
 def screen(stdscr):
     """Main screen object"""
@@ -21,8 +20,8 @@ def screen(stdscr):
 
         while True:
             message = pyfiglet.figlet_format("TypingTest", font="slant")
-            stdscr.addstr(0, 1, message)
-            stdscr.addstr(6, 1, "     ________________________________________")
+            stdscr.addstr(0, 0, message)
+            stdscr.addstr(7, 0, "     ________________________________________")
 
             # Take characters
             key = stdscr.getch()
