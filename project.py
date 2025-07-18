@@ -30,9 +30,9 @@ def colorized_message(message, color="cyan"):
             console.print(i, end="")
             time.sleep(0.04)
 
-def sample_words(num):
+def sample_words(num, n):
     """Appears the TypingText"""
-    dictionary = dict(num)
+    dictionary = dict(num, n)
     clear()
     enterance()
     print("")
@@ -63,22 +63,39 @@ def better_print(text):
 
 def get_valid_input():
     """Length taker"""
-    while True:
-        try:
+    try:
+        # Taking the number of words
+        clear()
+        enterance()
+        print("")
+        colorized_message("Choose the number of your typing test words: ", "green")
+        num = int(input())
+        
+        if num < 30:
+            colorized_message("Choose 30 or more words!", "red")
+            time.sleep(3)
+            return get_valid_input()  # Call again if num is invalid
+
+        # Taking the words length upper bound
+        while True:
             clear()
             enterance()
             print("")
-            colorized_message("Choose the number of your typing test words: ", "green")
-            num = int(input())
-            if num < 30:
-                colorized_message("Choose 30 or more words!", "red")
-                time.sleep(3)        
-            else:
-                sample_words(num)
-                break
+            colorized_message("The length of the words are less equal to: ", "green")
+            n = int(input())
 
-        except ValueError:
-            colorized_message("Your input number was not in a valid integer form", "red")
+            if n < 4:
+                colorized_message("Choose words with 4 or more letters", "red")
+                time.sleep(3)
+            else:
+                break  # Exit the loop if n is valid
+
+        sample_words(num, n)  # Call sample_words with valid inputs
+
+    except ValueError:
+        colorized_message("Your input number was not in a valid integer form", "red")
+        time.sleep(3)
+        return get_valid_input()  # Call again if input is invalid
 
 def main():
     clear()
