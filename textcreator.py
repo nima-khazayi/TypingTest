@@ -1,10 +1,17 @@
 import random
 import nltk
-from nltk.corpus import words # Import the words
-word_list = words.words() # Get the list of English words
+from nltk.corpus import words
+
+# Check if the words corpus is already downloaded
+try:
+    words.words()
+except LookupError:
+    nltk.download("words")  # Download the words corpus if not already present
+
+word_list = words.words()  # Get the list of English words
 
 def dict(num):
-    nltk.download("words") # Download the words corpus
+    """Generate a list of words of the specified number"""
     dictionary = generate(num)
     return dictionary
 

@@ -1,12 +1,11 @@
 from rich.console import Console    # For colored output
 from rich.text import Text          # For styled text
-import curses
 import pyfiglet                     # For ASCII art
 import os
 import shutil
 import time
 from textcreator import dict
-from initializer import init, screen
+from initializer import root
 
 console = Console()
 
@@ -59,9 +58,7 @@ def better_print(text):
 
     text_tmp[0] = " " + text_tmp[0]
     text = " ".join(text_tmp) 
-    print(text)
-    init(text, height, width)
-    curses.wrapper(screen)
+    root(text, height, width)
 
 
 def get_valid_input():
