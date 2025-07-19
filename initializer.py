@@ -1,6 +1,7 @@
 import pyfiglet
 import curses
 from wpm import TypingSession
+import time
 
 var = None
 line = None
@@ -8,6 +9,8 @@ cursor = None
 height = None
 width = None
 session = None
+start_time = None
+end_time = None
 words = []
 length = []
 
@@ -60,7 +63,7 @@ def root(text, h, w):
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width, words, length, session
+    global var, line, cursor, height, width, words, length, session, start_time, end_time
 
     try:
         """Main screen object"""
@@ -84,11 +87,19 @@ def screen(stdscr):
             key = stdscr.getch()
             session.run(stdscr, key)
             if handle_input(stdscr, key):
+                # When the script is going to an end
+                global end_time
+
+                end_time = time.time()
+                duration = end_time - start_time
+
+                words_per_minute = len(words) / (duration / 60)
+                accuracy_score = session.get_accuracy()
+                stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+                stdscr.refresh()
+                time.sleep(3)
                 break
         
-        accuracy_score = session.get_accuracy()
-        stdscr.addstr(height - 1, 0, f"Accuracy: {accuracy_score:.2f}%")
-        stdscr.refresh()
 
     except Exception as e:
         print(f"Curses error: {e}")  # Debug output before exiting
@@ -116,7 +127,11 @@ def handle_input(stdscr, key):
     
 def movement(stdscr):
     """Keep going infront"""
-    global cursor
+    global cursor, start_time
+
+    if start_time is None:
+        start_time = time.time()
+
     cursor += 1
 
 def boundary_controller(stdscr):

@@ -29,3 +29,4 @@ class TypingSession:
         """Return the accuracy"""
         correct = len(self.text) - self.wrong
         return (correct / len(self.text)) * 100
+    
