@@ -1,12 +1,15 @@
 import curses
 
-def run():
+def run(stdscr, w, k):
     """Callable function to pass arguments"""
-    pass
+    text = " ".join(w)
+    accuracy(text, k)
+    
 
 
 def wpm():
     pass
 
-def accuracy():
-    pass
+def accuracy(text, key):
+    wrong = 0
+    sum = len(text)

@@ -7,6 +7,8 @@ line = None
 cursor = None
 height = None
 width = None
+words = []
+length = []
 
 """
     We fill this part with a summary
@@ -15,7 +17,7 @@ width = None
 
 def init(text, h, w):
     """Take the global variable text"""
-    global var, line, cursor, height, width
+    global var, line, cursor, height, width, words, length
 
     # Initialize global variables
     height = h
@@ -23,6 +25,25 @@ def init(text, h, w):
     var = text
     line = 9
     cursor = 0
+
+    # Split words in a list called words
+    tmp = var.split(" ")
+    for i in range(len(tmp)):
+        tmp[i] = tmp[i].replace(" ", "")
+        tmp[i] = tmp[i].replace("\n", "")
+        words.append(tmp[i])
+
+    # Save the length of each line in a list called length
+    counter = 0
+    for i in var:
+        if i == "\n":
+            length.append(counter)
+            counter = 0
+
+        else:
+            counter += 1
+    length.append(counter) # This is for the last line which does not have \n
+
 
 def root(text, h, w):
     """This is called in other modules"""
@@ -35,7 +56,7 @@ def root(text, h, w):
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width
+    global var, line, cursor, height, width, words, length
 
     try:
         """Main screen object"""
@@ -52,10 +73,12 @@ def screen(stdscr):
             stdscr.addstr(0, 0, message)
             stdscr.addstr(7, 0, "     ________________________________________")
             stdscr.addstr(9, 0, var)
+            boundary_controller(stdscr)
             stdscr.move(line, cursor)
             stdscr.refresh()  # Ensure screen updates
 
             key = stdscr.getch()
+            run(stdscr, words, key)
             if handle_input(stdscr, key):
                 break
 
@@ -84,5 +107,18 @@ def handle_input(stdscr, key):
         stdscr.refresh()
     
 def movement(stdscr):
+    """Keep going infront"""
     global cursor
     cursor += 1
+
+def boundary_controller(stdscr):
+    """Always keeps us in the screen"""
+    global length, cursor, line
+
+    if cursor >= length[line - 9]:
+        cursor = 1
+        line += 1
+
+
+
+
