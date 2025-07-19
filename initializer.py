@@ -11,6 +11,8 @@ width = None
 session = None
 start_time = None
 end_time = None
+counter = None
+flag = None 
 words = []
 length = []
 
@@ -21,7 +23,7 @@ length = []
 
 def init(text, h, w):
     """Take the global variable text"""
-    global var, line, cursor, height, width, words, length, session
+    global var, line, cursor, height, width, words, length, session, counter, flag
 
     # Initialize global variables
     height = h
@@ -29,6 +31,8 @@ def init(text, h, w):
     var = text
     line = 9
     cursor = 0
+    counter = -1
+    flag = False
 
     # Split words in a list called words
     tmp = var.split(" ")
@@ -38,15 +42,15 @@ def init(text, h, w):
         words.append(tmp[i])
 
     # Save the length of each line in a list called length
-    counter = 0
+    c = 0
     for i in var:
         if i == "\n":
-            length.append(counter)
-            counter = 0
+            length.append(c)
+            c = 0
 
         else:
-            counter += 1
-    length.append(counter) # This is for the last line which does not have \n
+            c += 1
+    length.append(c) # This is for the last line which does not have \n
 
     # Make session Typingsession Class Type
     session = TypingSession(words)
@@ -63,7 +67,7 @@ def root(text, h, w):
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width, words, length, session, start_time, end_time
+    global var, line, cursor, height, width, words, length, session, start_time, end_time, counter, flag
 
     try:
         """Main screen object"""
@@ -79,11 +83,20 @@ def screen(stdscr):
 
         # Display initial content
         stdscr.addstr(height - 2, width // 2 - 12, "Press Space To Continue", curses.A_BOLD)
+        key = stdscr.getch() # Pulse to get start
+        if key == 32:
+            stdscr.move(height - 2, 0)
+            stdscr.clrtoeol()
+            movement(stdscr)
+            stdscr.refresh()
+            counter += 1
+
+        stdscr.addstr(9, 0, var)
+
         while True:
             message = pyfiglet.figlet_format("TypingTest", font="slant")
             stdscr.addstr(0, 0, message)
             stdscr.addstr(7, 0, "     ________________________________________")
-            stdscr.addstr(9, 0, var)
             boundary_controller(stdscr)
             stdscr.move(line, cursor)
             stdscr.refresh()  # Ensure screen updates
@@ -99,7 +112,12 @@ def screen(stdscr):
 
                 words_per_minute = len(words) / (duration / 60)
                 accuracy_score = session.get_accuracy()
-                stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+                if flag:
+                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
+                    
+                else:
+                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+
                 stdscr.refresh()
                 time.sleep(3)
                 break
@@ -118,16 +136,21 @@ def screen(stdscr):
 
 def handle_input(stdscr, key):
     """Function for keys' handling"""
-    global height
+    global height, flag
 
     if key == 27:
+        flag = True
+        return True
+    
+    elif line - 9 == len(length):
         return True
     
     elif key == 32:
-        stdscr.move(height - 2, 0)
-        stdscr.clrtoeol()
-        movement(stdscr)
-        stdscr.refresh()
+        if var[cursor] == " " or var[cursor] == "\n":
+            movement(stdscr)
+
+        else:
+            alphabet_handling(stdscr, key)
 
     elif key == 127:
         remove(stdscr)
@@ -138,7 +161,29 @@ def handle_input(stdscr, key):
 
 def alphabet_handling(stdscr, key):
     """Handle input || Color the value"""
-    global words
+    global counter, var
+
+    if key == 32:
+        var = var[:cursor] + " " + var[cursor + 1:]
+        stdscr.addstr(9, 0, var, curses.color_pair(3))
+        stdscr.addstr(line, cursor, " ", curses.color_pair(2))
+        movement(stdscr)
+        counter += 1
+
+    else:
+        if chr(key) == var[cursor - 1]:
+            var = var[:cursor] + chr(key) + var[cursor:]
+            stdscr.addstr(9, 0, var, curses.color_pair(3))
+            stdscr.addstr(line, cursor, chr(key), curses.color_pair(1))
+            movement(stdscr)
+            counter += 1
+
+        else:
+            var = var[:cursor] + chr(key) + var[cursor + 1:]
+            stdscr.addstr(9, 0, var, curses.color_pair(3))
+            stdscr.addstr(line, cursor, chr(key), curses.color_pair(2))
+            movement(stdscr)
+            counter += 1
     
 
 def remove(stdscr):
