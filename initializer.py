@@ -72,6 +72,10 @@ def screen(stdscr):
         stdscr.keypad(True)
         stdscr.clear()
         stdscr.refresh()
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
         # Display initial content
         stdscr.addstr(height - 2, width // 2 - 12, "Press Space To Continue", curses.A_BOLD)
@@ -124,7 +128,23 @@ def handle_input(stdscr, key):
         stdscr.clrtoeol()
         movement(stdscr)
         stdscr.refresh()
+
+    elif key == 127:
+        remove(stdscr)
+
+    else:
+        alphabet_handling(stdscr, key)
+
+
+def alphabet_handling(stdscr, key):
+    """Handle input || Color the value"""
+    global words
     
+
+def remove(stdscr):
+    pass
+
+
 def movement(stdscr):
     """Keep going infront"""
     global cursor, start_time
