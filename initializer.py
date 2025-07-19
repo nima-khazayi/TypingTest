@@ -1,12 +1,13 @@
 import pyfiglet
 import curses
-from wpm import run
+from wpm import TypingSession
 
 var = None
 line = None
 cursor = None
 height = None
 width = None
+session = None
 words = []
 length = []
 
@@ -17,7 +18,7 @@ length = []
 
 def init(text, h, w):
     """Take the global variable text"""
-    global var, line, cursor, height, width, words, length
+    global var, line, cursor, height, width, words, length, session
 
     # Initialize global variables
     height = h
@@ -44,6 +45,9 @@ def init(text, h, w):
             counter += 1
     length.append(counter) # This is for the last line which does not have \n
 
+    # Make session Typingsession Class Type
+    session = TypingSession(words)
+
 
 def root(text, h, w):
     """This is called in other modules"""
@@ -56,7 +60,7 @@ def root(text, h, w):
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width, words, length
+    global var, line, cursor, height, width, words, length, session
 
     try:
         """Main screen object"""
@@ -78,9 +82,13 @@ def screen(stdscr):
             stdscr.refresh()  # Ensure screen updates
 
             key = stdscr.getch()
-            run(stdscr, words, key)
+            session.run(stdscr, key)
             if handle_input(stdscr, key):
                 break
+        
+        accuracy_score = session.get_accuracy()
+        stdscr.addstr(height - 1, 0, f"Accuracy: {accuracy_score:.2f}%")
+        stdscr.refresh()
 
     except Exception as e:
         print(f"Curses error: {e}")  # Debug output before exiting
