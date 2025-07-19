@@ -17,7 +17,7 @@ def dict(num, n):
 
 def generate(num_words, n):
     """Used choice instead of random.sample to allow duplicate words"""
-    """Generate a list of words with 7 letters or less, ensuring the list length equals num_words"""
+    """Generate a list of words with n letters or less, ensuring the list length equals num_words"""
     filtered_words = [word for word in word_list if len(word) <= n]
     
     result = []

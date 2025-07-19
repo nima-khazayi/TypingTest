@@ -1,5 +1,6 @@
 import pyfiglet
 import curses
+from wpm import run
 
 var = None
 line = None
@@ -70,9 +71,9 @@ def screen(stdscr):
         curses.endwin()
 
 def handle_input(stdscr, key):
+    """Function for keys' handling"""
     global height
 
-    """Function for keys' handling"""
     if key == 27:
         return True
     
