@@ -3,6 +3,7 @@ import curses
 from wpm import TypingSession
 import time
 
+# Global variables (initialized here to avoid None issues)
 var = None
 line = None
 cursor = None
@@ -11,63 +12,72 @@ width = None
 session = None
 start_time = None
 end_time = None
-counter = None
-flag = None 
+flag = None
+letter_counter = None
+word_counter = None
+each_wrd_len = []
 words = []
 length = []
 
 """
-    We fill this part with a summary
-    of what init part will do
+    Summary: The init function sets up global variables, processes the input text into words and line lengths,
+    and initializes the TypingSession for tracking typing metrics.
 """
 
 def init(text, h, w):
     """Take the global variable text"""
-    global var, line, cursor, height, width, words, length, session, counter, flag
+    global var, line, cursor, height, width, words, length, session, flag, each_wrd_len, letter_counter, word_counter
 
     # Initialize global variables
     height = h
     width = w
-    var = text
+    var = text.strip()
     line = 9
     cursor = 0
-    counter = -1
     flag = False
+    letter_counter = 0
+    word_counter = 0
+    words = []
+    each_wrd_len = []
+    length = []
 
     # Split words in a list called words
-    tmp = var.split(" ")
-    for i in range(len(tmp)):
-        tmp[i] = tmp[i].replace(" ", "")
-        tmp[i] = tmp[i].replace("\n", "")
-        words.append(tmp[i])
+    tmp = var.replace("\n", " ").split()
+    for word in tmp:
+        cleaned = word.strip()  # Remove any extra spaces or artifacts
+        if cleaned:  # Skip empty words
+            words.append(cleaned)
+            each_wrd_len.append(len(cleaned))
 
-    # Save the length of each line in a list called length
+
+    # Save the length of each line in the original text
     c = 0
-    for i in var:
-        if i == "\n":
+    for char in var:
+        if char == "\n":
             length.append(c)
             c = 0
-
         else:
             c += 1
-    length.append(c) # This is for the last line which does not have \n
+    if c > 0:  # Only append if there's content in the last line
+        length.append(c)
 
-    # Make session Typingsession Class Type
+
+    # Initialize TypingSession
     session = TypingSession(words)
 
 
 def root(text, h, w):
-    """This is called in other modules"""
+    """This is called in other modules to start the app."""
     init(text, h, w)  # Call init with the provided parameters
     curses.wrapper(screen)
 
 """
-    we fill this part with a summary
-    of what running part will do
+    Summary: The running part (screen function) handles the main curses loop, displays the UI,
+    processes user input, tracks typing progress, and calculates metrics at the end.
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width, words, length, session, start_time, end_time, counter, flag
+    global var, line, cursor, height, width, words, length, session, start_time, end_time, flag, letter_counter, word_counter, each_wrd_len
 
     try:
         """Main screen object"""
@@ -77,9 +87,9 @@ def screen(stdscr):
         stdscr.clear()
         stdscr.refresh()
         curses.start_color()
-        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK) # Correct
+        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK) # Incorrect
+        curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK) # Neutral
 
         # Display initial content
         stdscr.addstr(height - 2, width // 2 - 12, "Press Space To Continue", curses.A_BOLD)
@@ -87,32 +97,44 @@ def screen(stdscr):
         if key == 32:
             stdscr.move(height - 2, 0)
             stdscr.clrtoeol()
-            movement(stdscr)
             stdscr.refresh()
-            counter += 1
+            start_time = time.time()  # Fix: Start timer here after prompt
 
-        stdscr.addstr(9, 0, var)
+        # Display the text to type
+        stdscr.addstr(9, 1, var, curses.color_pair(3))
 
         while True:
+            # Display title
             message = pyfiglet.figlet_format("TypingTest", font="slant")
             stdscr.addstr(0, 0, message)
             stdscr.addstr(7, 0, "     ________________________________________")
+
             boundary_controller(stdscr)
             stdscr.move(line, cursor)
             stdscr.refresh()  # Ensure screen updates
 
             key = stdscr.getch()
             session.run(stdscr, key)
+
+            # Update counters after input
+            if letter_counter == each_wrd_len[word_counter]:
+                word_counter += 1
+                letter_counter = 0
+                if word_counter >= len(words): # If all words done
+                    break
+            
+
             if handle_input(stdscr, key):
-                # When the script is going to an end
-                global end_time
+                # End of test handling
 
                 end_time = time.time()
-                duration = end_time - start_time
+                duration = end_time - start_time if start_time else 0
 
-                words_per_minute = len(words) / (duration / 60)
+                words_typed = word_counter + (1 if letter_counter > 0 else 0)
+                words_per_minute = (words_typed / (duration / 60)) if duration > 0 else 0
                 accuracy_score = session.get_accuracy()
-                if flag:
+
+                if flag: # Incomplete test
                     stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
                     
                 else:
@@ -138,73 +160,74 @@ def handle_input(stdscr, key):
     """Function for keys' handling"""
     global height, flag
 
-    if key == 27:
+    if key == 27: # ESC to quit
         flag = True
         return True
     
-    elif line - 9 == len(length):
+    elif line - 9 >= len(length) and cursor >= length[-1]: # End condition
         return True
-    
-    elif key == 32:
-        if var[cursor] == " " or var[cursor] == "\n":
-            movement(stdscr)
-
-        else:
-            alphabet_handling(stdscr, key)
 
     elif key == 127:
         remove(stdscr)
+        return False
 
     else:
         alphabet_handling(stdscr, key)
+        return False
 
 
 def alphabet_handling(stdscr, key):
     """Handle input || Color the value"""
-    global counter, var
+    global words, line, cursor, each_wrd_len, letter_counter, word_counter
 
-    if key == 32:
-        var = var[:cursor] + " " + var[cursor + 1:]
-        stdscr.addstr(9, 0, var, curses.color_pair(3))
-        stdscr.addstr(line, cursor, " ", curses.color_pair(2))
-        movement(stdscr)
-        counter += 1
+    if word_counter >= len(words) or letter_counter >= each_wrd_len[word_counter]:
+        return  # Prevent index errors
+    
+    expected_char = words[word_counter][letter_counter]
 
-    else:
-        if chr(key) == var[cursor - 1]:
-            var = var[:cursor] + chr(key) + var[cursor:]
-            stdscr.addstr(9, 0, var, curses.color_pair(3))
-            stdscr.addstr(line, cursor, chr(key), curses.color_pair(1))
+    if key == 32: # Space
+        if letter_counter == each_wrd_len[word_counter]:  # Correct space between words
+            stdscr.addstr(line, cursor, " ", curses.color_pair(1))
             movement(stdscr)
-            counter += 1
 
         else:
-            var = var[:cursor] + chr(key) + var[cursor + 1:]
-            stdscr.addstr(9, 0, var, curses.color_pair(3))
-            stdscr.addstr(line, cursor, chr(key), curses.color_pair(2))
+            stdscr.addstr(line, cursor, " ", curses.color_pair(2))
             movement(stdscr)
-            counter += 1
-    
+
+    else:
+        input_char = chr(key)
+        color = 1 if input_char == expected_char else 2  # Green or red
+        stdscr.addstr(line, cursor, input_char, curses.color_pair(color))
+        movement(stdscr)
+
+    letter_counter += 1
+
 
 def remove(stdscr):
+    """Handle backspace: Remove last character and decrement counters."""
     pass
 
 
 def movement(stdscr):
-    """Keep going infront"""
+    """Advance cursor and handle timer start."""
     global cursor, start_time
 
     if start_time is None:
         start_time = time.time()
 
     cursor += 1
+    boundary_controller(stdscr)  # Call here to immediately check bounds
 
 def boundary_controller(stdscr):
-    """Always keeps us in the screen"""
+    """Keep cursor within screen and line bounds."""
     global length, cursor, line
 
-    if cursor >= length[line - 9]:
-        cursor = 1
+    if line - 9 >= len(length):
+        return  # End of text
+
+    max_line_len = length[line - 9]
+    if cursor > max_line_len:  # Use > to catch overflow
+        cursor = 0  # Reset to start of next line
         line += 1
 
 
