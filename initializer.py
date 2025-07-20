@@ -39,16 +39,21 @@ def init(text, h, w):
     word_counter = 0
     words = []
     each_wrd_len = []
-    length = []
+    length = [0]
 
     # Split words in a list called words
-    tmp = var.split(" ")
-    current_line_length = 0
-    current_line = []
+    words = var.split(" ")
+    for word in range(len(words)):
+        words[word] += " "
 
-    for word in tmp:
-        pass
-        # TO-DO
+    for word in words:
+        each_wrd_len.append(len(word))
+        if length[-1] + each_wrd_len[-1] + 1 >= width:
+            length.append(0)
+            length[-1] += each_wrd_len[-1]
+
+        else:    
+            length[-1] += each_wrd_len[-1]
 
 
     # Initialize TypingSession
@@ -89,12 +94,24 @@ def screen(stdscr):
             stdscr.refresh()
             start_time = time.time()  # Fix: Start timer here after prompt
 
-        # Clear the area for typing text
-        for i in range(line, height - 1):
-            stdscr.addstr(i, 0, " " * width)  # Clear lines for typing
-
         # Display the text to type
-        # TO-DO
+        sum_of_lines = 0
+        counter = 0
+
+        while True:
+            if sum_of_lines >= len(length):
+                break
+
+            temporary = 0
+            while temporary < length[line - 9] and counter < len(words):
+                stdscr.addstr(line, cursor, words[counter], curses.color_pair(3))
+                temporary += each_wrd_len[counter]
+                cursor += each_wrd_len[counter]
+                counter += 1
+
+            line += 1
+            cursor = 0
+            sum_of_lines += 1    
 
         while True:
             # Display title
