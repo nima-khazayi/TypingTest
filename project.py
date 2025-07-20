@@ -82,8 +82,8 @@ def get_valid_input():
         colorized_message("Choose the number of your typing test words: ", "green")
         num = int(input())
         
-        if num < 30:
-            colorized_message("Choose 30 or more words!", "red")
+        if num < 30 or num > 100:
+            colorized_message("Choose 30 or more words but not over 100.", "red")
             time.sleep(3)
             return get_valid_input()  # Call again if num is invalid
 
@@ -95,8 +95,8 @@ def get_valid_input():
             colorized_message("The length of the words are less equal to: ", "green")
             n = int(input())
 
-            if n < 4:
-                colorized_message("Choose words with 4 or more letters", "red")
+            if n < 4 or n > 10:
+                colorized_message("Choose words with 4 or more letters but not over 10.", "red")
                 time.sleep(3)
             else:
                 break  # Exit the loop if n is valid
