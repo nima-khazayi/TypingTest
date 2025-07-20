@@ -4,7 +4,7 @@ import pyfiglet                     # For ASCII art
 import os
 import shutil
 import time
-from textcreator import dict
+from features.textcreator import dict
 from initializer import root
 
 console = Console()

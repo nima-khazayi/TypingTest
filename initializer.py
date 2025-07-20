@@ -1,6 +1,6 @@
 import pyfiglet
 import curses
-from wpm import TypingSession
+from features.wpm import TypingSession
 import time
 
 # Global variables (initialized here to avoid None issues)
