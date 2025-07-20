@@ -13,6 +13,7 @@ session = None
 start_time = None
 end_time = None
 flag = None
+permisson = None
 letter_counter = None
 word_counter = None
 each_wrd_len = []
@@ -26,7 +27,7 @@ length = []
 
 def init(text, h, w):
     """Take the global variable text"""
-    global var, line, cursor, height, width, words, length, session, flag, each_wrd_len, letter_counter, word_counter
+    global var, line, cursor, height, width, words, length, session, flag, each_wrd_len, letter_counter, word_counter, permisson
 
     # Initialize global variables
     height = h
@@ -35,6 +36,7 @@ def init(text, h, w):
     line = 9
     cursor = 0
     flag = False
+    permisson = False
     letter_counter = 0
     word_counter = 0
     words = []
@@ -132,8 +134,7 @@ def screen(stdscr):
                 stdscr.move(line, cursor)
 
             key = stdscr.getch()
-            session.run(stdscr, key)
-            
+            session.run(stdscr, key)            
 
             if handle_input(stdscr, key):
                 # End of test handling
@@ -178,9 +179,8 @@ def handle_input(stdscr, key):
     if word_counter >= len(words):  # End condition
         return True
 
-    elif key == 127:
+    elif key in (127, curses.KEY_BACKSPACE):
         remove(stdscr)
-        return False
 
     else:
         alphabet_handling(stdscr, key)
@@ -188,29 +188,66 @@ def handle_input(stdscr, key):
 
 def alphabet_handling(stdscr, key):
     """Handle input || Color the value"""
-    global words, line, cursor, each_wrd_len, letter_counter, word_counter
+    global words, line, cursor, each_wrd_len, letter_counter, word_counter, permisson
 
-    if word_counter >= len(words):
-        return True # Prevent index errors
+    if permisson:
+        return
     
-    expected_char = words[word_counter][letter_counter]
+    else:
+        if word_counter >= len(words):
+            return True # Prevent index errors
+        
+        expected_char = words[word_counter][letter_counter]
 
-    input_char = chr(key)
-    color = 1 if input_char == expected_char else 2  # Green or red
-    stdscr.addstr(line, cursor, input_char, curses.color_pair(color))
-    movement(stdscr)
+        input_char = chr(key)
+        if input_char == expected_char: # Green or red
+            stdscr.addstr(line, cursor, input_char, curses.color_pair(1))
+            movement(stdscr)
 
-    letter_counter += 1
+        else:
+            stdscr.addstr(line, cursor, input_char, curses.color_pair(2))
+            movement(stdscr)
+            permisson = True
 
-    if letter_counter == each_wrd_len[word_counter]:
-        letter_counter = 0
-        word_counter += 1
+        letter_counter += 1
+
+        if letter_counter == each_wrd_len[word_counter]:
+            letter_counter = 0
+            word_counter += 1
 
 
 def remove(stdscr):
     """Handle backspace: Remove last character and decrement counters."""
-    pass
+    global words, line, cursor, each_wrd_len, letter_counter, word_counter, permisson
 
+    if permisson:
+
+        if cursor == 0:
+            line -= 1
+            cursor = length[line - 9] - 1
+
+        else:
+            cursor -= 1
+
+        if letter_counter == 0:
+            word_counter -= 1
+            letter_counter = each_wrd_len[word_counter] - 1
+            stdscr.move(line, cursor)
+            stdscr.refresh()
+            stdscr.addstr(line, cursor, " ")
+
+        else:
+            letter_counter -= 1
+
+            stdscr.move(line, cursor)
+            stdscr.refresh()
+            expected_char = words[word_counter][letter_counter]
+            stdscr.addstr(line, cursor, expected_char, curses.color_pair(3))
+
+        permisson = False
+
+    else:
+        return
 
 def movement(stdscr):
     """Advance cursor and handle timer start."""
