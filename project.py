@@ -43,6 +43,32 @@ def sample_words(num, n):
     height = terminal_size.lines
     width = terminal_size.columns
 
+    includ_upper(text, height, width)
+
+
+def includ_upper(text, height, width):
+    """Words should include uppercase letters or not"""
+    clear()
+    enterance()
+    print("")
+    colorized_message("With uppercase letters? (y/n): ", "green")
+    try:
+        decision = input()
+        if decision != "n" and decision != "y":
+            colorized_message("Your input was not in a valid form", "red")
+            time.sleep(3)
+            raise Exception
+        
+        else:
+            if decision == "n":
+                text = text.lower()
+
+    except Exception:
+        includ_upper(text, height, width)
+
+    clear()
+    enterance()
+    print("")
     root(text, height, width)
 
 

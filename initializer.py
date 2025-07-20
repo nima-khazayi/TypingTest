@@ -125,7 +125,8 @@ def screen(stdscr):
             stdscr.move(line, cursor)
             stdscr.refresh()  # Ensure screen updates
 
-            if word_counter == length[line - 9] - 1:
+            # Check if line index is within bounds
+            if line - 9 < len(length) and word_counter == length[line - 9] - 1:
                 line += 1
                 cursor = 0
                 stdscr.move(line, cursor)
@@ -136,7 +137,6 @@ def screen(stdscr):
 
             if handle_input(stdscr, key):
                 # End of test handling
-
                 end_time = time.time()
                 duration = end_time - start_time if start_time else 0
 
@@ -174,7 +174,8 @@ def handle_input(stdscr, key):
         flag = True
         return True
     
-    elif line - 9 >= len(length) and cursor >= length[-1]: # End condition
+    # Check if the user has typed all words
+    if word_counter >= len(words):  # End condition
         return True
 
     elif key == 127:
@@ -232,7 +233,5 @@ def boundary_controller(stdscr):
     if cursor > max_line_len:  # Use > to catch overflow
         cursor = 0  # Reset to start of next line
         line += 1
-
-
 
 
