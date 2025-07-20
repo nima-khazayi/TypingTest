@@ -111,7 +111,10 @@ def screen(stdscr):
 
             line += 1
             cursor = 0
-            sum_of_lines += 1    
+            sum_of_lines += 1 
+
+        line = 9
+        cursor = 0   
 
         while True:
             # Display title
@@ -119,19 +122,16 @@ def screen(stdscr):
             stdscr.addstr(0, 0, message)
             stdscr.addstr(7, 0, "     ________________________________________")
 
-            boundary_controller(stdscr)
             stdscr.move(line, cursor)
             stdscr.refresh()  # Ensure screen updates
 
+            if word_counter == length[line - 9] - 1:
+                line += 1
+                cursor = 0
+                stdscr.move(line, cursor)
+
             key = stdscr.getch()
             session.run(stdscr, key)
-
-            # Update counters after input
-            if letter_counter == each_wrd_len[word_counter]:
-                word_counter += 1
-                letter_counter = 0
-                if word_counter >= len(words): # If all words done
-                    break
             
 
             if handle_input(stdscr, key):
@@ -183,36 +183,27 @@ def handle_input(stdscr, key):
 
     else:
         alphabet_handling(stdscr, key)
-        return False
 
 
 def alphabet_handling(stdscr, key):
     """Handle input || Color the value"""
     global words, line, cursor, each_wrd_len, letter_counter, word_counter
 
-    if word_counter >= len(words) or letter_counter >= each_wrd_len[word_counter]:
-        return  # Prevent index errors
+    if word_counter >= len(words):
+        return True # Prevent index errors
     
     expected_char = words[word_counter][letter_counter]
 
-    if key == 32: # Space
-        if letter_counter == each_wrd_len[word_counter]:  # Correct space between words
-            stdscr.addstr(line, cursor, " ", curses.color_pair(1))
-            movement(stdscr)
+    input_char = chr(key)
+    color = 1 if input_char == expected_char else 2  # Green or red
+    stdscr.addstr(line, cursor, input_char, curses.color_pair(color))
+    movement(stdscr)
 
-        else:
-            stdscr.addstr(line, cursor, " ", curses.color_pair(2))
-            movement(stdscr)
+    letter_counter += 1
 
-            letter_counter += 1
-
-    else:
-        input_char = chr(key)
-        color = 1 if input_char == expected_char else 2  # Green or red
-        stdscr.addstr(line, cursor, input_char, curses.color_pair(color))
-        movement(stdscr)
-
-        letter_counter += 1
+    if letter_counter == each_wrd_len[word_counter]:
+        letter_counter = 0
+        word_counter += 1
 
 
 def remove(stdscr):
@@ -237,9 +228,9 @@ def boundary_controller(stdscr):
     if line - 9 >= len(length):
         return  # End of text
 
-    max_line_len = length[line - 9]
+    max_line_len = length[line - 9] - 1
     if cursor > max_line_len:  # Use > to catch overflow
-        cursor = 1  # Reset to start of next line
+        cursor = 0  # Reset to start of next line
         line += 1
 
 
