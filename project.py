@@ -37,27 +37,12 @@ def sample_words(num, n):
     enterance()
     print("")
     text = " ".join(dictionary)
-    better_print(text)
-    
 
-def better_print(text):
-    """Take the terminal length, Hints, More user friendly"""
     # Initialize the screen size
     terminal_size = shutil.get_terminal_size()
     height = terminal_size.lines
     width = terminal_size.columns
 
-    # Make the text of the words, screen dynamic
-    words_length = 0
-    text_tmp = text.split(" ")
-    for i in range(len(text_tmp)):
-        words_length += len(text_tmp[i]) + 1
-        if words_length >= width:
-            text_tmp[i - 1] += "\n"
-            words_length = len(text_tmp[i])
-
-    text_tmp[0] = " " + text_tmp[0]
-    text = " ".join(text_tmp) 
     root(text, height, width)
 
 

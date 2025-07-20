@@ -31,7 +31,7 @@ def init(text, h, w):
     # Initialize global variables
     height = h
     width = w
-    var = text.strip()
+    var = text
     line = 9
     cursor = 0
     flag = False
@@ -42,24 +42,13 @@ def init(text, h, w):
     length = []
 
     # Split words in a list called words
-    tmp = var.replace("\n", " ").split()
+    tmp = var.split(" ")
+    current_line_length = 0
+    current_line = []
+
     for word in tmp:
-        cleaned = word.strip()  # Remove any extra spaces or artifacts
-        if cleaned:  # Skip empty words
-            words.append(cleaned)
-            each_wrd_len.append(len(cleaned))
-
-
-    # Save the length of each line in the original text
-    c = 0
-    for char in var:
-        if char == "\n":
-            length.append(c)
-            c = 0
-        else:
-            c += 1
-    if c > 0:  # Only append if there's content in the last line
-        length.append(c)
+        pass
+        # TO-DO
 
 
     # Initialize TypingSession
@@ -100,8 +89,12 @@ def screen(stdscr):
             stdscr.refresh()
             start_time = time.time()  # Fix: Start timer here after prompt
 
+        # Clear the area for typing text
+        for i in range(line, height - 1):
+            stdscr.addstr(i, 0, " " * width)  # Clear lines for typing
+
         # Display the text to type
-        stdscr.addstr(9, 1, var, curses.color_pair(3))
+        # TO-DO
 
         while True:
             # Display title
@@ -194,13 +187,15 @@ def alphabet_handling(stdscr, key):
             stdscr.addstr(line, cursor, " ", curses.color_pair(2))
             movement(stdscr)
 
+            letter_counter += 1
+
     else:
         input_char = chr(key)
         color = 1 if input_char == expected_char else 2  # Green or red
         stdscr.addstr(line, cursor, input_char, curses.color_pair(color))
         movement(stdscr)
 
-    letter_counter += 1
+        letter_counter += 1
 
 
 def remove(stdscr):
@@ -227,7 +222,7 @@ def boundary_controller(stdscr):
 
     max_line_len = length[line - 9]
     if cursor > max_line_len:  # Use > to catch overflow
-        cursor = 0  # Reset to start of next line
+        cursor = 1  # Reset to start of next line
         line += 1
 
 
