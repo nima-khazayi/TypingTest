@@ -7,11 +7,8 @@ def test_clear():
     assert project.clear() is None
 
 
-def test_colorized_message_white():
+def test_colorized_message():
     assert project.colorized_message("Hello", color="white") is None
-
-
-def test_colorized_message_colored():
     assert project.colorized_message("Hello", color="cyan") is None
 
 
@@ -24,9 +21,9 @@ def test_colorized_message_colored():
 )
 @patch("builtins.input")
 @patch("project.root")
-def test_includ_upper(mock_root, mock_input, user_input, original_text, expected_text):
+def test_include_upper(mock_root, mock_input, user_input, original_text, expected_text):
     mock_input.return_value = user_input
-    project.includ_upper(original_text, 24, 80)
+    project.include_upper(original_text, 24, 80)
     mock_root.assert_called_once_with(expected_text, 24, 80)
 
     if user_input == "n":

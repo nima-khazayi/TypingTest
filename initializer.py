@@ -1,7 +1,11 @@
 import pyfiglet
 import curses
 from features.wpm import TypingSession
+from features.textcreator import dict
 import time
+import os
+import signal
+
 
 # Global variables (initialized here to avoid None issues)
 var = None
@@ -16,6 +20,10 @@ flag = None
 permisson = None
 letter_counter = None
 word_counter = None
+Num = None
+N = None
+Decision = None
+pge_number = None
 each_wrd_len = []
 words = []
 length = []
@@ -25,9 +33,9 @@ length = []
     and initializes the TypingSession for tracking typing metrics.
 """
 
-def init(text, h, w):
+def init(text, h, w, num, n, decision):
     """Take the global variable text"""
-    global var, line, cursor, height, width, words, length, session, flag, each_wrd_len, letter_counter, word_counter, permisson
+    global var, line, cursor, height, width, words, length, session, flag, each_wrd_len, letter_counter, word_counter, permisson, Num, N, Decision, pge_number
 
     # Initialize global variables
     height = h
@@ -37,8 +45,12 @@ def init(text, h, w):
     cursor = 0
     flag = False
     permisson = False
+    pge_number = True
     letter_counter = 0
     word_counter = 0
+    Num = num
+    N = n
+    Decision = decision
     words = []
     each_wrd_len = []
     length = [0]
@@ -62,9 +74,9 @@ def init(text, h, w):
     session = TypingSession(words)
 
 
-def root(text, h, w):
+def root(text, h, w, num, n, decision):
     """This is called in other modules to start the app."""
-    init(text, h, w)  # Call init with the provided parameters
+    init(text, h, w, num, n, decision)  # Call init with the provided parameters
     curses.wrapper(screen)
 
 """
@@ -73,7 +85,7 @@ def root(text, h, w):
 """    
 
 def screen(stdscr):
-    global var, line, cursor, height, width, words, length, session, start_time, end_time, flag, letter_counter, word_counter, each_wrd_len
+    global var, line, cursor, height, width, words, length, session, start_time, end_time, flag, letter_counter, word_counter, each_wrd_len, pge_number
 
     try:
         """Main screen object"""
@@ -94,7 +106,7 @@ def screen(stdscr):
             stdscr.move(height - 2, 0)
             stdscr.clrtoeol()
             stdscr.refresh()
-            start_time = time.time()  # Fix: Start timer here after prompt
+            start_time = time.time()  # Start timer here after prompt
 
         # Display the text to type
         sum_of_lines = 0
@@ -118,42 +130,43 @@ def screen(stdscr):
         line = 9
         cursor = 0   
 
-        while True:
-            # Display title
-            message = pyfiglet.figlet_format("TypingTest", font="slant")
-            stdscr.addstr(0, 0, message)
-            stdscr.addstr(7, 0, "     ________________________________________")
+        if pge_number:
+            while True:
+                # Display title
+                message = pyfiglet.figlet_format("TypingTest", font="slant")
+                stdscr.addstr(0, 0, message)
+                stdscr.addstr(7, 0, "     ________________________________________")
 
-            stdscr.move(line, cursor)
-            stdscr.refresh()  # Ensure screen updates
-
-            # Check if line index is within bounds
-            if line - 9 < len(length) and word_counter == length[line - 9] - 1:
-                line += 1
-                cursor = 0
                 stdscr.move(line, cursor)
+                stdscr.refresh()  # Ensure screen updates
 
-            key = stdscr.getch()
-            session.run(stdscr, key)            
+                # Check if line index is within bounds
+                if line - 9 < len(length) and word_counter == length[line - 9] - 1:
+                    line += 1
+                    cursor = 0
+                    stdscr.move(line, cursor)
 
-            if handle_input(stdscr, key):
-                # End of test handling
-                end_time = time.time()
-                duration = end_time - start_time if start_time else 0
+                key = stdscr.getch()
+                session.run(stdscr, key)            
 
-                words_typed = word_counter + (1 if letter_counter > 0 else 0)
-                words_per_minute = (words_typed / (duration / 60)) if duration > 0 else 0
-                accuracy_score = session.get_accuracy()
+                if handle_input(stdscr, key):
+                    # End of test handling
+                    end_time = time.time()
+                    duration = end_time - start_time if start_time else 0
 
-                if flag: # Incomplete test
-                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
-                    
-                else:
-                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+                    words_typed = word_counter + (1 if letter_counter > 0 else 0)
+                    words_per_minute = (words_typed / (duration / 60)) if duration > 0 else 0
+                    accuracy_score = session.get_accuracy()
 
-                stdscr.refresh()
-                time.sleep(3)
-                break
+                    if flag: # Incomplete test
+                        stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
+                        
+                    else:
+                        stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+
+                    stdscr.refresh()
+                    time.sleep(3)
+                    break
         
 
     except Exception as e:
@@ -181,6 +194,9 @@ def handle_input(stdscr, key):
 
     elif key in (127, curses.KEY_BACKSPACE):
         remove(stdscr)
+
+    elif key == 9:
+        reset(stdscr)
 
     else:
         alphabet_handling(stdscr, key)
@@ -271,4 +287,14 @@ def boundary_controller(stdscr):
         cursor = 0  # Reset to start of next line
         line += 1
 
+def reset(stdscr):
+    global Num, N, Decision, height, width, pge_number
 
+    dictionary = dict(Num, N)
+
+    text = " ".join(dictionary)
+    if Decision == "n":
+        text = text.lower()
+
+    pge_number = False
+    root(text, height, width, Num, N, Decision)

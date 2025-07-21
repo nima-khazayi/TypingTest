@@ -43,10 +43,10 @@ def sample_words(num, n):
     height = terminal_size.lines
     width = terminal_size.columns
 
-    includ_upper(text, height, width)
+    include_upper(text, height, width, num, n)
 
 
-def includ_upper(text, height, width):
+def include_upper(text, height, width, num, n):
     """Words should include uppercase letters or not"""
     clear()
     enterance()
@@ -64,12 +64,12 @@ def includ_upper(text, height, width):
                 text = text.lower()
 
     except Exception:
-        includ_upper(text, height, width)
+        include_upper(text, height, width, num, n)
 
     clear()
     enterance()
     print("")
-    root(text, height, width)
+    root(text, height, width, num, n, decision)
 
 
 def get_valid_input():
