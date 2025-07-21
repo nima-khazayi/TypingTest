@@ -45,7 +45,7 @@ def init(text, h, w, num, n, decision):
     cursor = 0
     flag = False
     permisson = False
-    pge_number = True
+    pge_number = False
     letter_counter = 0
     word_counter = 0
     Num = num
@@ -130,45 +130,48 @@ def screen(stdscr):
         line = 9
         cursor = 0   
 
-        if pge_number:
-            while True:
-                # Display title
-                message = pyfiglet.figlet_format("TypingTest", font="slant")
-                stdscr.addstr(0, 0, message)
-                stdscr.addstr(7, 0, "     ________________________________________")
+        while True:
+            # Display title
+            message = pyfiglet.figlet_format("TypingTest", font="slant")
+            stdscr.addstr(0, 0, message)
+            stdscr.addstr(7, 0, "     ________________________________________")
 
+            stdscr.move(line, cursor)
+            stdscr.refresh()  # Ensure screen updates
+
+            # Check if line index is within bounds
+            if line - 9 < len(length) and word_counter == length[line - 9] - 1:
+                line += 1
+                cursor = 0
                 stdscr.move(line, cursor)
-                stdscr.refresh()  # Ensure screen updates
 
-                # Check if line index is within bounds
-                if line - 9 < len(length) and word_counter == length[line - 9] - 1:
-                    line += 1
-                    cursor = 0
-                    stdscr.move(line, cursor)
+            key = stdscr.getch()
+            # For terminating session
+            if key == 9:
+                pge_number = True
+                break
 
-                key = stdscr.getch()
-                session.run(stdscr, key)            
+            session.run(stdscr, key)            
 
-                if handle_input(stdscr, key):
-                    # End of test handling
-                    end_time = time.time()
-                    duration = end_time - start_time if start_time else 0
+            if handle_input(stdscr, key):
+                # End of test handling
+                end_time = time.time()
+                duration = end_time - start_time if start_time else 0
 
-                    words_typed = word_counter + (1 if letter_counter > 0 else 0)
-                    words_per_minute = (words_typed / (duration / 60)) if duration > 0 else 0
-                    accuracy_score = session.get_accuracy()
+                words_typed = word_counter + (1 if letter_counter > 0 else 0)
+                words_per_minute = (words_typed / (duration / 60)) if duration > 0 else 0
+                accuracy_score = session.get_accuracy()
 
-                    if flag: # Incomplete test
-                        stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
-                        
-                    else:
-                        stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
+                if flag: # Incomplete test
+                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: Test has not finished")
+                    
+                else:
+                    stdscr.addstr(height - 1, 0, f"Time: {duration:.2f}s | Accuracy: {accuracy_score:.2f}% | WPM: {words_per_minute:.2f}")
 
-                    stdscr.refresh()
-                    time.sleep(3)
-                    break
+                stdscr.refresh()
+                time.sleep(3)
+                break
         
-
     except Exception as e:
         print(f"Curses error: {e}")  # Debug output before exiting
         raise
@@ -179,6 +182,8 @@ def screen(stdscr):
         stdscr.keypad(False)
         curses.echo()
         curses.endwin()
+        if pge_number:
+            reset(stdscr)
 
 def handle_input(stdscr, key):
     """Function for keys' handling"""
@@ -194,9 +199,6 @@ def handle_input(stdscr, key):
 
     elif key in (127, curses.KEY_BACKSPACE):
         remove(stdscr)
-
-    elif key == 9:
-        reset(stdscr)
 
     else:
         alphabet_handling(stdscr, key)
@@ -296,5 +298,4 @@ def reset(stdscr):
     if Decision == "n":
         text = text.lower()
 
-    pge_number = False
     root(text, height, width, Num, N, Decision)
