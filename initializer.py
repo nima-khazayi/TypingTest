@@ -3,8 +3,6 @@ import curses
 from features.wpm import TypingSession
 from features.textcreator import dict
 import time
-import os
-import signal
 
 
 # Global variables (initialized here to avoid None issues)
