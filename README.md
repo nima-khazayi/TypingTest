@@ -1,9 +1,11 @@
-# Typing Test
+# TypingTest
 
 #### Video Demo: <URL HERE>
 
 #### Description:
 This Typing Test project allows users to practice typing with varying levels of difficulty. It includes features such as colored output, customizable word selection, and typing metrics.
+This project uses nltk package to generate sample words and create the plain text of your typing test.
+It also uses python curses module to initialize a terminal window as the foreground of the TypingTest app.
 
 ### Features:
 - **Clear Screen**: Clears the terminal before starting the test.
