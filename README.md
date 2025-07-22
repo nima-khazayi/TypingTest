@@ -3,9 +3,27 @@
 #### Video Demo: <https://youtu.be/nty1rE6nezo?si=tlLzKj6rgLkLKyWq>
 
 #### Description:
-This Typing Test project allows users to practice typing with varying levels of difficulty. It includes features such as colored output, customizable word selection, and typing metrics.
-This project uses nltk package to generate sample words and create the plain text of your typing test.
-It also uses python curses module to initialize a terminal window as the foreground of the TypingTest app.
+A typing test is a structured assessment designed to evaluate a person's typing speed and accuracy. It typically involves typing a series of words, sentences, or passages within a specified time limit. These tests are commonly used in educational settings, professional environments, and self-improvement initiatives to help individuals develop their typing skills and increase productivity.
+
+The Typing Test project provides a robust and engaging platform for users to practice and refine their typing abilities, catering to typists of all levels—from beginners to advanced users. This application is meticulously crafted to create an immersive learning experience that emphasizes both usability and effectiveness.
+
+Key features of the Typing Test application include:
+
+- **Dynamic Word Selection**: Users can customize their typing sessions by selecting the number of words and setting a maximum length for those words. This flexibility allows for tailored practice sessions, whether users seek a quick warm-up or a more challenging workout.
+
+- **Inclusion of Uppercase Letters**: The option to include uppercase letters adds complexity to the tests, helping users improve their proficiency in handling diverse typing scenarios, such as typing names, titles, or acronyms.
+
+- **Real-Time Feedback**: The application provides instant visual feedback through color-coded messaging. Correctly typed characters are displayed in green, while mistakes are highlighted in red. This immediate reinforcement helps users recognize typing habits and encourages them to adjust their approach in real-time.
+
+- **Performance Metrics**: Comprehensive metrics, including Words Per Minute (WPM) and accuracy percentages, are calculated during each session. These metrics are invaluable for users to track their progress, set goals, and celebrate improvements over time, allowing them to visualize their growth and identify specific areas that require further practice.
+
+- **Interactive Curses Interface**: Utilizing the `curses` library, the application presents a responsive and user-friendly terminal interface. This design promotes concentration by minimizing distractions, enabling users to focus entirely on their typing. The seamless interaction encourages longer practice sessions, making learning more effective.
+
+- **ASCII Art and Engaging Prompts**: The application enhances the user experience with visually appealing ASCII art that serves as a welcoming introduction to each session. Thoughtfully crafted prompts guide users through the process, ensuring clarity and ease of use.
+
+This Typing Test project not only aims to improve typing speed but also emphasizes accuracy and overall typing fluency. It serves as an excellent tool for students, professionals, and anyone looking to enhance their typing skills in a fun and interactive way.
+
+Join a community of learners dedicated to mastering the art of typing. Dive into the Typing Test project and discover how enjoyable and rewarding improving your typing skills can be!
 
 ### Features:
 - **Clear Screen**: Clears the terminal before starting the test.
