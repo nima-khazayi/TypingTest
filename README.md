@@ -1,6 +1,6 @@
 # TypingTest
 
-#### Video Demo: <URL HERE>
+#### Video Demo: <https://youtu.be/nty1rE6nezo?si=tlLzKj6rgLkLKyWq>
 
 #### Description:
 This Typing Test project allows users to practice typing with varying levels of difficulty. It includes features such as colored output, customizable word selection, and typing metrics.
